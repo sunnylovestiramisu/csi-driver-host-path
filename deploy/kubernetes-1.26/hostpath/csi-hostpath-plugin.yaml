@@ -219,12 +219,13 @@ spec:
       serviceAccountName: csi-hostpathplugin-sa
       containers:
         - name: hostpath
-          image: registry.k8s.io/sig-storage/hostpathplugin:v1.12.1
+          image: gcr.io/songsunny-joonix/hostpathplugin:v1.12.1
           args:
             - "--drivername=hostpath.csi.k8s.io"
             - "--v=5"
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--nodeid=$(KUBE_NODE_NAME)"
+            - "--enable-controller-modify-volume=true"
           env:
             - name: CSI_ENDPOINT
               value: unix:///csi/csi.sock
@@ -310,7 +311,7 @@ spec:
           - --health-port=9898
 
         - name: csi-attacher
-          image: registry.k8s.io/sig-storage/csi-attacher:v4.4.3
+          image: registry.k8s.io/sig-storage/csi-attacher:v4.5.0
           args:
             - --v=5
             - --csi-address=/csi/csi.sock
@@ -324,7 +325,7 @@ spec:
             name: socket-dir
 
         - name: csi-provisioner
-          image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.3
+          image: registry.k8s.io/sig-storage/csi-provisioner:v4.0.0
           args:
             - -v=5
             - --csi-address=/csi/csi.sock
@@ -340,10 +341,11 @@ spec:
               name: socket-dir
 
         - name: csi-resizer
-          image: registry.k8s.io/sig-storage/csi-resizer:v1.9.3
+          image: gcr.io/songsunny-joonix/csi-resizer:v1.9.3
           args:
             - -v=5
             - -csi-address=/csi/csi.sock
+            - --feature-gates=VolumeAttributesClass=true
           securityContext:
             # This is necessary only for systems with SELinux, where
             # non-privileged sidecar containers cannot access unix domain socket
